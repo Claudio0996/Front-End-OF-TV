@@ -3,8 +3,10 @@ import { ImageUploader } from "../ImageUploader/ImageUploader";
 import styles from "./SlideForm.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSlide } from "../../../../shared/apiClient";
+import useAuth from "../../../auth/hooks/useAuth";
 
 export default function SlideForm({ onFulffiled }) {
+  const { state } = useAuth();
   const queryClient = useQueryClient();
   let previewUrl;
   const [file, setFile] = useState(null);
@@ -27,7 +29,7 @@ export default function SlideForm({ onFulffiled }) {
     const fd = new FormData(e.target);
     fd.append("mediaType", fileType.split("/")[0]);
 
-    mutate(fd);
+    mutate({ token: state.token, formData: fd });
   }
 
   previewUrl = file ? URL.createObjectURL(file) : null;

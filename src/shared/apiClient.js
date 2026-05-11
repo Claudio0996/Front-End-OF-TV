@@ -1,48 +1,77 @@
-export const getSlides = async () => {
-  const response = await fetch("http://localhost:3000/slides");
-  const resData = await response.json();
+import axios from "axios";
 
-  if (!response.ok) {
-    throw new Error(resData.message);
-  }
+const instance = axios.create({
+  baseURL: "http://localhost:3000/",
+  withCredentials: true,
+});
 
-  return resData.data;
+export const setAuthInterceptor = (dispatch) => {
+  instance.interceptors.response.use(
+    function onSuccess(response) {
+      return response;
+    },
+    async function onInvalidToken(error) {
+      const originalRequest = error.config;
+
+      if (error.response?.status === 401) {
+        try {
+          if (!originalRequest._retry) {
+            originalRequest._retry = true;
+            const newResponse = await instance.get("auth/refresh");
+
+            originalRequest.headers.Authorization = `Bearer ${newResponse.data.token}`;
+            dispatch({ type: "ALTER_TOKEN", payload: newResponse.data.token });
+
+            return instance(originalRequest);
+          }
+        } catch (err) {
+          dispatch({ type: "REVOKE_DATA" });
+        }
+      }
+      throw error;
+    },
+  );
+};
+
+export const getSlides = async (token) => {
+  console.log(token);
+  const response = await instance.get("slides", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
 };
 
 export const getActiveSlides = async () => {
-  const response = await fetch("http://localhost:3000/active-slides");
-  const resData = await response.json();
+  const response = await instance.get("active-slides");
 
-  if (!response.ok) {
-    throw new Error(resData.message);
-  }
-
-  return resData.data;
+  return response.data;
 };
 
-export const deleteSlide = async (id) => {
-  const response = await fetch(`http://localhost:3000/slide/${id}`, {
-    method: "DELETE",
+export const deleteSlide = async ({ token, id }) => {
+  const response = await instance.delete(`slide/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-  const resData = await response.json();
 
-  if (!response.ok) {
-    throw new Error(resData.message);
-  }
-
-  return resData;
+  return response.data;
 };
 
-export const createSlide = async (formData) => {
-  const response = await fetch("http://localhost:3000/slide", {
-    method: "POST",
-    body: formData,
+export const createSlide = async ({ token, formData }) => {
+  const response = await instance.post("slide", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
-  const resData = await response.json();
-  if (!response.ok) {
-    throw new Error(resData.message);
-  }
+  return response.data;
+};
 
-  return resData;
+export const loginUser = async (userData) => {
+  const response = await instance.post("auth/login", userData);
+
+  return response.data;
 };

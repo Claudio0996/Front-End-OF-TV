@@ -4,12 +4,13 @@ import styles from "./PlayerPage.module.css";
 
 export default function PlayerPage() {
   const { data, isPending, isError, error } = useActiveSlide();
+  console.log(data.data);
 
   return (
     <section className={styles.container}>
       {isPending && <p style={{ textAlign: "center" }}>Buscando slides...</p>}
       {isError && <p>Error: {error.message || "Falha ao buscar slides"}</p>}
-      {data.length > 0 && <Slider slides={data} />}
+      {data.data.length > 0 && <Slider slides={data.data} />}
     </section>
   );
 }

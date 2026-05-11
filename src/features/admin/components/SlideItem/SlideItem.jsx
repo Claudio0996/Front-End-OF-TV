@@ -2,8 +2,10 @@ import styles from "./SlideItem.module.css";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteSlide } from "../../../../shared/apiClient";
+import useAuth from "../../../auth/hooks/useAuth";
 
 export default function SlideItem({ data }) {
+  const { state } = useAuth();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     onSuccess: () => {
@@ -11,10 +13,6 @@ export default function SlideItem({ data }) {
     },
     mutationFn: deleteSlide,
   });
-
-  function handleClick(itemId) {
-    mutate(itemId);
-  }
 
   return (
     <li className={styles.info_container}>
@@ -36,7 +34,7 @@ export default function SlideItem({ data }) {
         <button
           className={styles.info_container_right_exclude}
           onClick={() => {
-            handleClick(data._id);
+            mutate({ token: state.token, id: data._id });
           }}
         >
           <DeleteOutlineOutlinedIcon />
