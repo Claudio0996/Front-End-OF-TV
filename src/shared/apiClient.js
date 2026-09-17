@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: "https://backend-com-conex-o-r2-cloudflare.onrender.com",
   withCredentials: true,
 });
 
