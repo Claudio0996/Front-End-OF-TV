@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import PlayerPage from "../features/player/PlayerPage";
-import LoginPage from "../features/auth/loginPage";
+import LoginPage from "../features/auth/LoginPage";
 import AdminPage from "../features/admin/AdminPage";
 import PrivateRoute from "../app/PrivateRoute";
 
